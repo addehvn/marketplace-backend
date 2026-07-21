@@ -7,11 +7,21 @@ const productValidation=require('../middleware/productValidation.js');
 const upload= require('../middleware/multer.js');
 
 router.get('/',auth,(req,res,next)=>{
+  const page = Number(req.query.page)|| 1;
+
+  const LIMIT = 10;
+
+  const OFFSET=(page-1)*10;
+
 const sql=`
-SELECT * FROM products ;
+SELECT *
+FROM products
+ORDER BY product_id ASC 
+LIMIT ?
+OFFSET ?
 `;
 
-db.query(sql,(err,result)=>{
+db.query(sql,[LIMIT,OFFSET],(err,result)=>{
   if(err){
     return next(err);
   };
@@ -109,7 +119,7 @@ WHERE product_id=? ;
 `;
 
 
-db.query(sql,[product_id],(err,result)=>{
+db.query(sql,[product_id],(err,result,)=>{
   if(err){
     return res.status(500).send(err.message);
   };
@@ -122,5 +132,28 @@ db.query(sql,[product_id],(err,result)=>{
 
 });
 });
+
+router.get('/search',auth,(req,res,next)=>{
+  const search =req.query.search 
+  
+  const sql =`
+  SELECT* 
+  FROM products 
+  WHERE title LIKE ?;
+  `;
+  db.query(sql,[`%${search}%`],(err,result)=>{
+    if(err){
+      return next(err);
+    };
+    if(result.length===0){
+      const error = new Error('no product found');
+      error.status=404;
+      return next(error);
+    };
+    res.status(200).send(result)
+  });
+});
+
+
 
 module.exports=router;

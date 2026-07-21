@@ -38,6 +38,8 @@ router.post('/signup',upload.single('image'), signupValidation,async (req,res,ne
   };
  
   if(err){
+
+    
     return next(err)
   }
   if(result){

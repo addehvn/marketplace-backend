@@ -55,13 +55,22 @@ router.post('/login',async(req,res,next)=>{
 });
 
 
-router.post('/users',auth,isAdmin,(req,res,next)=>{
+router.get('/users',auth,isAdmin,(req,res,next)=>{
+
+  const page = Number(req.query.page)||1;
+
+  const LIMIT =10;
+
+  const OFFSET =(page-1)*10;
+
 
 const sql=`
 SELECT first_name,last_name,username, user_role FROM users
 ORDER BY user_role
+LIMIT ? 
+OFFSET ?
 `;
-db.query(sql,(err,result)=>{
+db.query(sql,[LIMIT , OFFSET],(err,result)=>{
    if(err){
     return (err);
   };
@@ -79,10 +88,21 @@ db.query(sql,(err,result)=>{
 
 
 router.get('/products',auth,isAdmin,(req,res,next)=>{
+
+  const page = Number(req.query.page)
+
+  const LIMIT =10;
+  const  OFFSET =(page-1)*10
+
+
  const sql =`
+
  SELECT * FROM products
+ ORDER BY product_id ASC 
+ LIMIT ?
+OFFSET ?
  `;
- db.query(sql,(err,result)=>{
+ db.query(sql,[LIMIT,OFFSET],(err,result)=>{
   if(err){
     return res.status('something went wrong!');
 
@@ -93,46 +113,6 @@ router.get('/products',auth,isAdmin,(req,res,next)=>{
   });
  });
 });
-
-
-// router.patch('/user/update/:id',auth,isAdmin,upload.single('image'),async(req,res,next)=>{
-
-//   const id= req.params.id;
-
-//   if(req.file){
-//     req.body.image=req.file.filename
-//   };
-
-//   if(req.body.password){
-//     req.bod.password= await bcrypt.hash(req.body.password,10);
-//   };
-  
-//   const fields=[];
-//   const values=[];
-
-//   for( key in req.body){
-//     fields.push(`${key}=?`);
-//     values.push(req.body[key]);
-//   };
-//    values.push(id)
-//   const sql =`
-//   UPDATE users 
-//   SET ${fields.join(',')}, update_at=NOW()
-//   WHERE user_id=?;
-//   `;
-
-//   db.query(sql,values,(err,result)=>{
-//      if(err){
-//     return(err);
-//   };
-//     if(result.affectedRows===0){
-//       const error = new Error('you entered wrong detail');
-//       error.status=404;
-//       return next(error)
-//     };
-//     res.status(200).send('user updated sucessfully');
-//   });
-// });
 
 
 router.patch('/updateUser/:id',auth,isAdmin,updateUserValidtion,upload.single('image'),async(req,res)=>{
@@ -209,5 +189,48 @@ router.patch('/updateProduct/:id',auth,productValidation,upload.single('image'),
   });
 
 });
+
+router.get('/searchUser',(req,res,next)=>{
+  const search =req.query.search
+
+  const sql=`
+  SELECT * FROM users
+  WHERE username LIKE ?;
+  `;
+
+  db.query(sql,[`%${search}%`],(err,result)=>{
+    if(err){
+      return next(err);
+    };
+    if(result.length===0){
+      const error=new Error('user not found');
+      error.status=404;
+      return next(error);
+    };
+    res.status(200).send(result);
+  });
+});
+
+router.get('/searchProduct',(req,res,next)=>{
+  const search =req.query.search
+
+  const sql=`
+  SELECT * FROM product
+  WHERE username LIKE ?;
+  `;
+
+  db.query(sql,[`%${search}%`],(err,result)=>{
+    if(err){
+      return next(err);
+    };
+    if(result.length===0){
+      const error=new Error('product not found');
+      error.status=404;
+      return next(error);
+    };
+    res.status(200).send(result);
+  });
+});
+
 
 module.exports=router;
