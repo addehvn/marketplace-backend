@@ -133,7 +133,7 @@ db.query(sql,[product_id],(err,result,)=>{
 });
 });
 
-router.get('/search',auth,(req,res,next)=>{
+router.get('/search',(req,res,next)=>{
   const search =req.query.search 
   
   const sql =`
@@ -154,6 +154,44 @@ router.get('/search',auth,(req,res,next)=>{
   });
 });
 
+router.get('/filter',(req,res,next)=>{
+  const {maxPrice,
+      minPrice,
+      sort 
+  }=req.query
+
+  let  sql=`
+  SELECT * 
+  FROM products 
+  WHERE 1=1;
+  `;
+  const value=[]
+  if(maxPrice){
+    sql+=`And price<=?`;
+    value.push(maxPrice);
+  };
+  if(minPrice){
+    sql+=`AND price>=?`;
+    value.push(minPrice)
+  };
+  if(sort==='low'){
+    sql+=`ORDER BY price ASC`
+  };
+  if(sort==='high'){
+    sql+=`ORDER BY price DESC`
+  };
+
+  db.query(sql,value,(err,result)=>{
+    if(err){
+      return next(err)
+    };
+    if(result.length===0){
+      const error = new Error('something went wrong');
+      error.status=500;
+      return next (error);
+    };
+  });
+})
 
 
 module.exports=router;
