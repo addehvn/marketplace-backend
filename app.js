@@ -18,6 +18,5 @@ app.use('/products',productsRouter);
 app.use('/users',userRouter);
 app.use('/admin',adminRouter);
 app.use(errorHandler);
-app.listen(PORT,()=>{
-  console.log('server started on port'+PORT );
-});
+
+module.exports=app;

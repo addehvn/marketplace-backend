@@ -78,7 +78,7 @@ router.post('/login',loginValidation,async (req,res,next)=>{
   const match = await bcrypt.compare(password,user.password);
   if(!match){
     const error = new Error('email or password invalid');
-    error.status=404;
+    error.status=401;
     return next(error);
     
   }
@@ -137,7 +137,7 @@ db.query(sql,values,(err,result)=>{
   };
 
   if(result.affectedRows===0){
-      const error=new Error ('user nto found');
+      const error=new Error ('user not found');
       error.status=404;
       return next(error);
   };

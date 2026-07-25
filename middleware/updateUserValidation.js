@@ -29,7 +29,7 @@ function updateUserValidtion(req,res,next){
 
   if(password!== undefined && !passwordRegex.test(password)){
     const error = new Error('password must be at least 8 characters and must have "a-z,A-Z,0-9,! @ # $ % ^ & *..."');
-    error.status=401
+    error.status=400;
     return next(error);
   }
 

@@ -9,12 +9,12 @@ function loginValidation(req,res,next){
  
   if(!emailRegex.test(email)){
     const error = new Error('invalid email format ');
-    error.status=400;
+    error.status=401;
     return next(error);
   };
   if (!passwordRegex.test(password)){
     const error = new Error('password must be at least 8 characters and must have "a-z,A-Z,0-9,! @ # $ % ^ & *..."');
-    error.status=400;
+    error.status=401;
     return next(error);
    };
   next();
