@@ -1,5 +1,4 @@
 const request= require('supertest');
-const db = require ('../../server');
 const app=require ('../../app');
 
 describe("user sign up test",()=>{
@@ -36,9 +35,7 @@ describe("user sign up test",()=>{
 
   });
 
-afterAll((done)=>{
-  db.end(done)
-});
+
   
  
   

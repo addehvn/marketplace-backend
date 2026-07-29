@@ -6,7 +6,7 @@ const isOwner= require('../middleware/isOwner.js');
 const productValidation=require('../middleware/productValidation.js');
 const upload= require('../middleware/multer.js');
 
-router.get('/',auth,(req,res,next)=>{
+router.get('/',(req,res,next)=>{
   const page = Number(req.query.page)|| 1;
 
   const LIMIT = 10;
@@ -31,7 +31,7 @@ db.query(sql,[LIMIT,OFFSET],(err,result)=>{
 
 router.post('/newProduct',auth,upload.single('image'),productValidation,(req,res,next )=>{
   const {
-    title,
+    title,  
     price,
     description,
   }=req.body;
@@ -57,7 +57,85 @@ router.post('/newProduct',auth,upload.single('image'),productValidation,(req,res
   });
 });
 
-router.get('/:id',auth,(req,res,next)=>{
+
+router.get('/search',(req,res,next)=>{
+  console.log(req.query);
+  const search =req.query.search 
+  console.log(search)
+  const sql =`
+  SELECT * 
+  FROM products 
+  WHERE title LIKE ?;
+  `;
+  db.query(sql,[`%${search}%`],(err,result)=>{
+    if(err){
+      return next(err);
+    };
+    console.log(result);
+    if(result.length===0){
+      const error = new Error('no product found');
+      error.status=404;
+      return next(error);
+    };
+    res.status(200).send(result)
+  });
+});
+
+
+router.get('/filter',(req,res,next)=>{
+  const {maxPrice,
+      minPrice,
+      sort 
+  }=req.query
+
+  if((minPrice!== undefined && isNaN(Number(minPrice))) ||
+     (maxPrice!== undefined && isNaN(Number(maxPrice)))){
+      const error=new Error(' price should be only numbers');
+      error.status=400
+      return next(error);
+    };
+
+  let  sql=`
+  SELECT * 
+  FROM products 
+  WHERE 1=1
+  `;
+  const value=[]
+  if(maxPrice){
+    sql+=`And price<=?`;
+    value.push(maxPrice);
+  };
+  if(minPrice){
+    sql+=`AND price>=?`;
+    value.push(minPrice)
+  };
+  if(sort==='low'){
+    sql+=`ORDER BY price ASC`
+  };
+  if(sort==='high'){
+    sql+=`ORDER BY price DESC`
+  };
+
+  db.query(sql,value,(err,result)=>{
+         if(result.length===0){
+      const error = new Error('something went wrong');
+      error.status=404;
+    return next (error);
+    };
+   
+    if(err){
+      return next(err)
+    };
+    
+    res.status(200).send(result);
+  });
+});
+
+
+
+
+
+router.get('/:id',(req,res,next)=>{
   const product_id = req.params.id;
 
   sql=`
@@ -77,7 +155,9 @@ db.query(sql,[product_id],(err,result)=>{
 });
 });
 
-router.patch('/update/:id',auth,isOwner,upload.single('image'),productValidation,(req,res,next )=>{
+
+
+router.patch('/updateProducts/:id',auth,isOwner,upload.single('image'),productValidation,(req,res,next )=>{
 const id=req.params.id;
 const fields =[];
 const values=[];
@@ -121,7 +201,7 @@ WHERE product_id=? ;
 
 db.query(sql,[product_id],(err,result,)=>{
   if(err){
-    return res.status(500).send(err.message);
+    return next(err);
   };
   if(result.affectedRows===0){
     const error= new Error('product not found');
@@ -133,65 +213,8 @@ db.query(sql,[product_id],(err,result,)=>{
 });
 });
 
-router.get('/search',(req,res,next)=>{
-  const search =req.query.search 
-  
-  const sql =`
-  SELECT* 
-  FROM products 
-  WHERE title LIKE ?;
-  `;
-  db.query(sql,[`%${search}%`],(err,result)=>{
-    if(err){
-      return next(err);
-    };
-    if(result.length===0){
-      const error = new Error('no product found');
-      error.status=404;
-      return next(error);
-    };
-    res.status(200).send(result)
-  });
-});
 
-router.get('/filter',(req,res,next)=>{
-  const {maxPrice,
-      minPrice,
-      sort 
-  }=req.query
 
-  let  sql=`
-  SELECT * 
-  FROM products 
-  WHERE 1=1;
-  `;
-  const value=[]
-  if(maxPrice){
-    sql+=`And price<=?`;
-    value.push(maxPrice);
-  };
-  if(minPrice){
-    sql+=`AND price>=?`;
-    value.push(minPrice)
-  };
-  if(sort==='low'){
-    sql+=`ORDER BY price ASC`
-  };
-  if(sort==='high'){
-    sql+=`ORDER BY price DESC`
-  };
-
-  db.query(sql,value,(err,result)=>{
-    if(err){
-      return next(err)
-    };
-    if(result.length===0){
-      const error = new Error('something went wrong');
-      error.status=500;
-      return next (error);
-    };
-  });
-})
 
 
 module.exports=router;

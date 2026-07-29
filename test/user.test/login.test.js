@@ -15,7 +15,7 @@ describe('Testing user login ',()=>{
     expect(response.body).toHaveProperty('token');
   });
   
-  test('wrong password error ',async()=>{
+  test('wrong information error ',async()=>{
     const response=await request(app)
   .post('/users/login')
     .send({
