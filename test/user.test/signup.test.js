@@ -6,12 +6,12 @@ describe("user sign up test",()=>{
     const response=await request(app)
   .post('/users/signup')
   .send({
-     username:'testtest2',
+     username:'test100',
     first_name:'test',
     last_name:'test',
-    email:'test5@gmail.com',
+    email:'test100@gmail.com',
     password:'Test1234!',
-    phone_number:'12345677'
+    phone_number:'12345678'
      
   });
   expect(response.statusCode).toBe(200);

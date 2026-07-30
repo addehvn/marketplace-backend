@@ -14,7 +14,7 @@ describe('deleting product ',()=>{
     const token=loginResponse.body.token;
 
     const response=await request(app)
-    .delete('/products/deleteProduct/29')
+    .delete('/products/deleteProduct/49')
     .set('Authorization',`Bearer ${token}`)
     expect(response.statusCode).toBe(200);
   });
@@ -30,7 +30,7 @@ describe('deleting product ',()=>{
     const token=loginResponse.body.token;
 
     const response=await request(app)
-    .delete('/products/deleteProduct/32')
+    .delete('/products/deleteProduct/43')
     .set('Authorization',`Bearer ${token}`)
     expect(response.statusCode).toBe(403);
   });
@@ -38,7 +38,7 @@ describe('deleting product ',()=>{
   
    test('deleting product without login',async ()=>{
     const response=await request(app)
-    .delete('/products/deleteProduct/33')
+    .delete('/products/deleteProduct/50')
     
     expect(response.statusCode).toBe(401)
    });

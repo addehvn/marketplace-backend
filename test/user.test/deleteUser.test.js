@@ -13,14 +13,14 @@ describe('deleting user',()=>{
     const token=loginResponse.body.token
 
     const response=await request(app)
-    .delete('/users/delete/39')
+    .delete('/users/delete/49')
     .set('Authorization',`Bearer ${token}`)
 
     expect(response.statusCode).toBe(200);
     
   });
 
-  test('delete only your user',async()=>{
+  test('delete another user',async()=>{
       const loginResponse=await request(app)
       .post('/users/login')
       .send({
@@ -31,7 +31,7 @@ describe('deleting user',()=>{
     const token=loginResponse.body.token;
 
     const response=await request(app)
-    .delete('/users/delete/27')
+    .delete('/users/delete/51')
     .set('Authorization',`Bearer ${token}`);
 
     expect(response.statusCode).toBe(403)
@@ -46,7 +46,7 @@ describe('deleting user',()=>{
     });
     const token =loginResponse.body.token 
     const response =await  request(app)
-    .delete('/users/delete/39')
+    .delete('/users/delete/1000')
     .set('Authorization',` Bearer ${token}`)
 
     expect(response.statusCode).toBe(401)

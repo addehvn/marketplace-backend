@@ -71,15 +71,16 @@ LIMIT ?
 OFFSET ?
 `;
 db.query(sql,[LIMIT , OFFSET],(err,result)=>{
+  
+  if(result.length===0){
+     const error = new Error('something went wrong !');
+    error.status=404;
+    return next(error)
+  };
    if(err){
     return (err);
   };
-  if(result.length===0){
-     const error = new Error('something went wrong !');
-    error.status=401;
-    return next(error)
-  };
-  res.status(200).send({
+  res.status(200).json({
     message: 'All users',
     json: result
   });
@@ -89,7 +90,7 @@ db.query(sql,[LIMIT , OFFSET],(err,result)=>{
 
 router.get('/products',auth,isAdmin,(req,res,next)=>{
 
-  const page = Number(req.query.page)
+  const page = Number(req.query.page)||1;
 
   const LIMIT =10;
   const  OFFSET =(page-1)*10
@@ -104,10 +105,15 @@ OFFSET ?
  `;
  db.query(sql,[LIMIT,OFFSET],(err,result)=>{
   if(err){
-    return res.status('something went wrong!');
+    return next(err)
 
   };
-  res.status(200).send({
+  if(result.length===0){
+     const error = new Error('something went wrong !');
+    error.status=404;
+    return next(error)
+  };
+  res.status(200).json({
     message :'All products',
     json :result
   });
@@ -115,20 +121,22 @@ OFFSET ?
 });
 
 
-router.patch('/updateUser/:id',auth,isAdmin,updateUserValidtion,upload.single('image'),async(req,res)=>{
+router.patch('/updateUser/:id',auth,isAdmin,upload.single('image'),updateUserValidtion,async(req,res,next)=>{
+  console.log(req.file)
+  console.log(req.body)
   const user_id=req.params.id
 
-  if(req.fil){
+  if(req.file){
     req.body.image=req.file.filename;
   }
-  if(req.user.password){
-    req.user.password=await bcrypt.hash(req.user.password,10);
+  if(req.body.password){
+    req.body.password=await bcrypt.hash(req.body.password,10);
   };
 
   const fields=[];
   const values=[];
 
-  for(key in req.body){
+  for(const key in req.body){
     fields.push(`${key}=?`);
     values.push(req.body[key]);
   };
@@ -145,26 +153,27 @@ router.patch('/updateUser/:id',auth,isAdmin,updateUserValidtion,upload.single('i
        return next(err);
     };
 
-    if(result.length===0){
+    if(result.affectedRows===0){
       const error = new Error ('you entered wrong detail');
-      error.status=401;
+      error.status=404;
+      return next(error);
     };
-
     
+    res.status(200).send('user updated successfully ')
   });
 
 });
 
-router.patch('/updateProduct/:id',auth,productValidation,upload.single('image'),(req,res,next)=>{
+router.patch('/updateProduct/:id',auth,upload.single('image'),productValidation,(req,res,next)=>{
   const product_id=req.params.id
 
   if(req.file){
-    req.body.file=req.file.filename;
+    req.body.image=req.file.filename;
   }
 
   const fields=[];
   const values=[];
-  for(key in req.body){
+  for(const key in req.body){
     fields.push(`${key}=?`);
     values.push(req.body[key]);
   }
@@ -175,7 +184,7 @@ router.patch('/updateProduct/:id',auth,productValidation,upload.single('image'),
   SET ${fields.join(',')}, update_at=NOW()
   WHERE product_id=?;
   `;
-  db(sql,values,(err,result)=>{
+  db.query(sql,values,(err,result)=>{
       if(err){
         return next(err);
       };
@@ -185,12 +194,12 @@ router.patch('/updateProduct/:id',auth,productValidation,upload.single('image'),
         error.status=404;
         return next(error);
       };
-
+        res.status(200).send('product updated successfully');
   });
 
 });
 
-router.get('/searchUser',(req,res,next)=>{
+router.get('/searchUser',auth,isAdmin,(req,res,next)=>{
   const search =req.query.search
 
   const sql=`
@@ -211,12 +220,12 @@ router.get('/searchUser',(req,res,next)=>{
   });
 });
 
-router.get('/searchProduct',(req,res,next)=>{
+router.get('/searchProduct',auth,isAdmin,(req,res,next)=>{
   const search =req.query.search
 
   const sql=`
-  SELECT * FROM product
-  WHERE username LIKE ?;
+  SELECT * FROM products
+  WHERE title LIKE ?;
   `;
 
   db.query(sql,[`%${search}%`],(err,result)=>{
@@ -231,6 +240,7 @@ router.get('/searchProduct',(req,res,next)=>{
     res.status(200).send(result);
   });
 });
+
 
 
 module.exports=router;

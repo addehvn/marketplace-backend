@@ -15,7 +15,7 @@ describe('updating products ',()=>{
     const token = loginResponse.body.token;
 
     const response= await request(app)
-    .patch('/products/update/30')
+    .patch('/products/updateProducts/58')
     .set('Authorization',`Bearer ${token}`)
     .send({
       title:'test1234'
@@ -29,14 +29,14 @@ describe('updating products ',()=>{
     const loginResponse=await request(app)
     .post('/users/login')
     .send({
-      email:'test@gmail.com',
-      password:'Test1234!'
+      email:'admin@gmail.com',
+      password:'Admin1234!'
 
     });
     const token =loginResponse.body.token;
 
     const response=await request(app)
-    .patch('/products/update/21')
+    .patch('/products/updateProducts/58')
     .set('Authorization',`Bearer ${token}`)
     .send({
       title:"test6",
@@ -49,7 +49,7 @@ describe('updating products ',()=>{
 
   test('updating without login ',async ()=>{
     const response= await request(app)
-    .patch('/products/updateProducts/30')
+    .patch('/products/updateProducts/58')
     .send({
       title:"test6",
     price:"200.00",
@@ -70,7 +70,7 @@ describe('updating products ',()=>{
     const token = loginResponse.body.token;
 
     const response= await request(app)
-    .patch('/products/update/30')
+    .patch('/products/updateProducts/58')
     .set('Authorization',`Bearer ${token}`)
     .send({
       price:"2000.00"
@@ -88,7 +88,7 @@ describe('updating products ',()=>{
     const token = loginResponse.body.token;
 
     const response= await request(app)
-    .patch('/products/update/30')
+    .patch('/products/updateProducts/58')
     .set('Authorization',`Bearer ${token}`)
     .attach('image','test/image/alexander-startsev-ndNw_6QGR_c-unsplash 1.jpg');
   });

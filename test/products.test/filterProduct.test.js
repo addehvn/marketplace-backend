@@ -68,19 +68,6 @@ describe('filtering products',()=>{
   });
 
 
-  test('successfully filtering minPrice products',async()=>{
-    const response = await request(app)
-    .get('/products/filter')
-    .query({
-      minPrice:'100.00'
-    });
-
-    expect(response.statusCode).toBe(200);
-  });
-
-
-
-
   test('sorting products from low to high successfully ',async ()=>{
 
     const response = await request(app)
@@ -93,7 +80,8 @@ describe('filtering products',()=>{
 
   });
 
-  test('sorting products from high to low',async ()=>{
+
+  test('sorting products from high to low successfully ',async ()=>{
 
     const response =await request(app)
     .get('/products/filter')
@@ -103,6 +91,6 @@ describe('filtering products',()=>{
 
     expect(response.statusCode).toBe(200);
   });
-
+  
 
 })

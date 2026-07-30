@@ -8,17 +8,17 @@ describe('updating user infromation',()=>{
     const loginResponse = await request(app)
     .post('/users/login')
     .send({
-      email:"test3@gmail.com",
+      email:"test22@gmail.com",
       password:"Test1234!"
     });
     
     const token = loginResponse.body.token 
 
     const response = await request(app)
-    .patch('/users/update/45')
+    .patch('/users/update/47')
     .set('Authorization',`Bearer ${token}`)
     .send({
-      email:'test5@gmail.com'
+      email:'test2@gmail.com'
     });
     expect(response.statusCode).toBe(200);
   });
@@ -37,7 +37,7 @@ describe('updating user infromation',()=>{
     const token = loginResponse.body.token
 
     const response= await request(app)
-    .patch('/users/update/45')
+    .patch('/users/update/50')
     .set('Authorization',`Bearer ${token}`)
     .send({
       email:'testtesttesetgmil.com'
@@ -48,7 +48,7 @@ describe('updating user infromation',()=>{
 
   test('updating without login  ',async()=>{
     const response =await request(app)
-    .patch('/users/update/27')
+    .patch('/users/update/50')
     .send({
       email:'test2@gmail.com'
     });
@@ -66,7 +66,7 @@ describe('updating user infromation',()=>{
     const token =  loginResponse.body.token
 
     const response=await request(app)
-    .patch('/users/update/27')
+    .patch('/users/update/50')
     .set('Authorization',`Bearer ${token}`)
     .send({
       email:'admin2@gmail.com'
