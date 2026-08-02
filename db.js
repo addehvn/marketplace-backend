@@ -1,11 +1,11 @@
 const express = require ('express');
 const mysql=require('mysql2');
-
+require('dotenv').config();
 const db = mysql.createConnection({
-  host:"127.0.0.1",
-  user:"root",
-  password:"Adde1928",
-  database:"ebayclonedb"
+  host:process.env.host,
+  user:process.env.user,
+  password:process.env.password,
+  database:process.env.database
 }
 );
 
